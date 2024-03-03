@@ -1,0 +1,39 @@
+@startuml "c4_container_image_service"
+!include libs/C4_Container.puml
+
+' AddElementTag("microService", $shape=EightSidedShape(), $bgColor="CornflowerBlue", $fontColor="white", $legendText="micro service\neight sided")
+AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="white")
+
+' SHOW_PERSON_OUTLINE()
+
+Person(admin, "Администратор", "Специалист, осуществляющий мониторинг сервиса")
+Person(data_scientist, "Специалист науки о данных", "Специалист, осуществляющий мониторинг модели машинного обучения")
+
+System_Boundary(c1_system_monitoring, "Система мониторинга") {
+    Container(grafana, "Grafana дашборд", "Go, TypeScript", "Показывает метрики сервиса, модели машинного обучения")
+    Container(prometheus, "Prometheus", "Go", "Собирает технические данные сервиса")
+    Container(postgres_grafana, "База данных для метрик Grafana", "PostgreSQL", "Хранит информацию по собранным метрикам для визуализации на дашборде", $tags = "storage")
+}
+System_Boundary(c1_ml_service, "Сервис обработки изображений") {
+    Container(postgres_ml, "База данных результатов работы модели машинного обучения", "PostgreSQL", "Хранит информацию по результатам работы модели машинного обучения", $tags = "storage")
+    Container(python_service, "Приложение обработки изображений", "Python", "Обрабатывает изображения при помощи модели машинного обучения")
+    
+}
+System_Ext(service_1, "Приложение 1", "Хранит изображения и информацию по ним")
+
+Rel_D(admin, grafana, "Осуществляет мониторинг сервиса", "HTTPS")
+Rel_D(data_scientist, grafana, "Осуществляет мониторинг модели машинного обучения", "HTTPS")
+Rel_D(grafana, postgres_grafana, "Сбор метрик", "REST API")
+Rel_U(prometheus, grafana, "Передает технические показатели сервиса")
+
+Rel_D(prometheus, python_service, "Осуществляет мониторинг сервиса", "HTTPS")
+Rel_D(grafana, postgres_ml, "Сбор информации о результатах работы модели машинного обучения", "REST API")
+
+Rel_U(python_service, postgres_ml, "Сохраняет результаты работы модели машинного обучения", "REST API")
+Rel_U(service_1, python_service, "Отправляет изображния для обработки", "Kafka")
+Rel_D(python_service, service_1, "Отправляет результат проверки изображений", "Kafka")
+Rel_U(service_1, python_service, "Отправляет итоговый результат проверки изображения", "Kafka")
+' Lay_R(reporting_service, audit_service)
+
+' SHOW_LEGEND()
+@enduml

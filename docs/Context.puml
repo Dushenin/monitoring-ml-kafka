@@ -1,0 +1,25 @@
+@startuml "c4_context_image_service"
+!include libs/C4_Context.puml
+
+' LAYOUT_WITH_LEGEND()
+
+' title Контекстная диаграмма системы мониторинга информационно-технологического сервиса обработки изображений
+
+Person(admin, "Администратор", "Специалист, осуществляющий мониторинг сервиса")
+Person(data_scientist, "Специалист науки о данных", "Специалист, осуществляющий мониторинг модели машинного обучения")
+
+System(service_ml_monitoring_system, "Система мониторинга", "Позволяет мониторить показатели сервиса, показатели модели машинного обучения")
+
+System_Ext(ml_service, "Сервис обработки изображений", "Обрабатывает изображения при помощи моделей машинного обучения")
+System_Ext(service_1, "Приложение 1", "Хранит изображения и информацию по ним")
+
+Rel(admin, service_ml_monitoring_system, "Использует для мониторинга сервиса")
+Rel(data_scientist, service_ml_monitoring_system, "Использует для мониторинга модели машинного обучения")
+
+Rel_D(service_ml_monitoring_system, ml_service, "Собирает данные о работе сервиса")
+Rel_D(service_ml_monitoring_system, ml_service, "Собирает данные о работе модели")
+
+Rel_Neighbor(service_1, ml_service, "Отправляет изображния для обработки", "Kafka")
+Rel_Neighbor(ml_service, service_1, "Отправляет результат проверки изображений", "Kafka")
+Rel_Neighbor(service_1, ml_service, "Отправляет итоговый результат проверки изображения", "Kafka")
+@enduml

@@ -1,0 +1,133 @@
+asyncapi: 3.0.0
+info:
+  title: ML service
+  version: 1.0.0
+  description: |-
+    Image processing service using machine learning models
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+defaultContentType: application/json
+servers:
+  test-ml-service:
+    host: test.mykafkacluster.org:18092
+    protocol: kafka-secure
+    description: Test broker secured with scramSha256
+    security:
+      - $ref: '#/components/securitySchemes/saslScram'
+    tags:
+      - name: env:test-scram
+        description: >-
+          This environment is meant for running internal tests through
+          scramSha256
+channels:
+  imageForChecking:
+    address: imageForChecking
+    messages:
+      imageForChecking:
+        $ref: '#/components/messages/imageTask'
+    description: This topic receives messages containing information on images for verification
+  imageChekingResult:
+    address: imageChekingResult
+    messages:
+      imageChekingResult:
+        $ref: '#/components/messages/imageResult'
+    description: This topic is for sending the results of the machine learning model
+  imageTotalResult:
+    address: imageTotalResult
+    messages:
+      imageTotalResult:
+        $ref: '#/components/messages/imageTotalResult'
+    description: This topic is for obtaining the final results of the machine learning model, taking into account the correctness check
+operations:
+  receiveImage:
+    action: receive
+    channel:
+      $ref: '#/channels/imageForChecking'
+    summary: Receiving an image for verification
+    messages:
+      - $ref: '#/channels/imageForChecking/messages/imageForChecking'
+  sendResult:
+    action: send
+    channel:
+      $ref: '#/channels/imageChekingResult'
+    summary: Receiving an image for verification
+    messages:
+      - $ref: '#/channels/imageChekingResult/messages/imageChekingResult'
+  receiveTotalResult:
+    action: receive
+    channel:
+      $ref: '#/channels/imageTotalResult'
+    summary: Receiving an image for verification
+    messages:
+      - $ref: '#/channels/imageTotalResult/messages/imageTotalResult'
+components:
+  messages:
+    imageTask:
+      name: imageTask
+      title: Image task
+      summary: Contains information about image
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/imageTaskPayload'
+    imageResult:
+      name: imageResult
+      title: Image result
+      summary: Results of the machine learning model
+      payload:
+        $ref: '#/components/schemas/imageResultPayload'
+    imageTotalResult:
+      name: imageTotalResult
+      title: Image total result
+      summary: Feedback on the results of the machine learning model
+      payload:
+        $ref: '#/components/schemas/imageTotalResultPayload'
+  schemas:
+    imageTaskPayload:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/taskId'
+        url:
+          $ref: '#/components/schemas/url'
+    imageResultPayload:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/taskId' 
+        ckeckHuman:
+          $ref: '#/components/schemas/checkHuman'
+    imageTotalResultPayload:
+      type: object
+      properties:
+        taskId:
+          $ref: '#/components/schemas/taskId'
+        ckeckHuman:
+          $ref: '#/components/schemas/checkHuman'
+    taskId:
+      type: string
+      format: uuid
+      description: Id of task
+      example: 550e8400-e29b-41d4-a716-446655440000
+    url:
+      type: string
+      minLenght: 1
+      maxLenght: 2000
+      description: >-
+        Path to the image
+      example: >-
+        https://cdn1.vectorstock.com/i/1000x1000/87/50/man-male-young-person-icon-vector-10458750.jpg
+    checkHuman:
+      type: boolean
+      description: true - there is a person in the photo, false - there is no person in the photo
+      example: False
+  securitySchemes:
+    saslScram:
+      type: scramSha256
+      description: Provide your username and password for SASL/SCRAM authentication
+    certs:
+      type: X509
+      description: Download the certificate files from service provider
+  parameters:
+    streetlightId:
+      description: The ID of the streetlight.
