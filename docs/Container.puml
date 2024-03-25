@@ -21,15 +21,15 @@ System_Boundary(c1_ml_service, "Сервис обработки изображе
 }
 System_Ext(service_1, "Приложение 1", "Хранит изображения и информацию по ним")
 
-Rel_D(admin, grafana, "Осуществляет мониторинг сервиса", "HTTPS")
-Rel_D(data_scientist, grafana, "Осуществляет мониторинг модели машинного обучения", "HTTPS")
-Rel_D(grafana, postgres_grafana, "Сбор метрик", "REST API")
+Rel_D(admin, grafana, "Осуществляет мониторинг сервиса")
+Rel_D(data_scientist, grafana, "Осуществляет мониторинг модели машинного обучения")
+Rel_D(grafana, postgres_grafana, "Сбор метрик")
 Rel_U(prometheus, grafana, "Передает технические показатели сервиса")
 
-Rel_D(prometheus, python_service, "Осуществляет мониторинг сервиса", "HTTPS")
-Rel_D(grafana, postgres_ml, "Сбор информации о результатах работы модели машинного обучения", "REST API")
+Rel_D(prometheus, python_service, "Запрос метрик сервиса")
+Rel_D(grafana, postgres_ml, "Сбор информации о результатах работы модели машинного обучения")
 
-Rel_U(python_service, postgres_ml, "Сохраняет результаты работы модели машинного обучения", "REST API")
+Rel_U(python_service, postgres_ml, "Сохраняет результаты работы модели машинного обучения")
 Rel_U(service_1, python_service, "Отправляет изображния для обработки", "Kafka")
 Rel_D(python_service, service_1, "Отправляет результат проверки изображений", "Kafka")
 Rel_U(service_1, python_service, "Отправляет итоговый результат проверки изображения", "Kafka")
