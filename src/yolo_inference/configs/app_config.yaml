@@ -1,0 +1,43 @@
+# --------------------------------------------- HYDRA -----------------------------------------------------
+defaults:  
+  - _self_  
+  - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: custom
+
+hydra:
+  output_subdir: null
+  run:  
+    dir: .
+
+# ----------------------------------------------- PIPELINE -------------------------------------------------
+
+
+  
+#--------------------------------------------------GENERAL--------------------------------------------------
+
+kafka_consumer:
+  bootstrap_servers: 127.0.0.1:9092  #kafka:29092
+  topic_name: imageForChecking
+  
+# ------------------------------------------------- NODES --------------------------------------------------
+
+detection_node:
+  weight_pth: yolov8m.pt
+  classes_to_detect: [0]  # Класс 0 - из классов COCO
+  confidence: 0.4  # Порог уверенности детектора (чем больше значение, тем меньше находит)
+  iou: 0.8  # Порог NMS (чем больше значение, тем больше находит)
+  imgsz: 640  # Ресайз при инференсе (640 по умолчанию)
+
+
+send_info_db_node:
+  connection_info:  # данные о подключении (должны совпадать со значениями из docker-compose файла)
+    user: ml_user
+    password: ml_password
+    host: localhost
+    port: 5488  # внешний порт контейнера с PostgreSQL
+    database: ml_db
+
+
+kafka_producer_node:
+  bootstrap_servers: 127.0.0.1:9092 #kafka:29092
+  topic_name: imageCheckingResult

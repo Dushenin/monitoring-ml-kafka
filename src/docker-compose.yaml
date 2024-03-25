@@ -1,0 +1,100 @@
+version: '3.8'
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    restart: always
+    ports:
+      - "2181:2181"
+    healthcheck:
+      test: [ "CMD", "nc", "-vz", "localhost", "2181" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    restart: always
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:29092,OUTSIDE://127.0.0.1:9092
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 72 # удаление сообщений через 72 часа
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+      KAFKA_LOG_CLEANUP_POLICY: delete
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "nc", "-vz", "localhost", "9092" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: always
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:29092"
+    depends_on:
+      - kafka
+  
+  pg_ml:
+    container_name: pg_ml
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ml_db
+      POSTGRES_USER: ml_user
+      POSTGRES_PASSWORD: ml_password
+    ports:
+      - "5488:5432"
+    volumes:
+      - ./ml_monitoring_services/pg_ml:/var/lib/postgresql/data
+
+  pg_grafana:
+    container_name: pg_grafana_1
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: grafana_db
+      POSTGRES_USER: grafana_user
+      POSTGRES_PASSWORD: grafana_password
+    ports:
+      - "5499:5432"
+    volumes:
+      - ./ml_monitoring_services/pg_grafana:/var/lib/postgresql/data
+
+  grafana:
+    container_name: grafana_1
+    image: grafana/grafana:latest
+    environment:
+      GF_DATABASE_TYPE: postgres
+      GF_DATABASE_HOST: pg_grafana
+      GF_DATABASE_NAME: grafana_db
+      GF_DATABASE_USER: grafana_user
+      GF_DATABASE_PASSWORD: grafana_password
+      GF_DATABASE_SSL_MODE: disable
+    restart: unless-stopped
+    depends_on:
+      - pg_grafana
+    ports:
+      - "3111:3000"
+    volumes:
+      - ./ml_monitoring_services/grafana:/var/lib/grafana
+
+volumes:
+  pg_data_wh:
+  pg_grafana:
+  grafana:

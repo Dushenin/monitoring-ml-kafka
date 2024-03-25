@@ -1,0 +1,20 @@
+
+# ----------------------------------------------- PIPELINE -------------------------------------------------
+
+telegram_token: 7059218199:AAEbiYddQC5bcgrc8v7xoVwOsosKpZxkwwY
+chat_id: "-4152751810"
+  
+# ------------------------------------------------- NODES --------------------------------------------------
+
+
+sent_info_db_node:
+  connection_info:  # данные о подключении (должны совпадать со значениями из docker-compose файла)
+    user: ml_user
+    password: ml_password
+    host: localhost
+    port: 5488  # внешний порт контейнера с PostgreSQL
+    database: ml_db
+
+kafka_comsumer:
+  topic : "imageCheckingResult"
+  bootstrap_servers : "127.0.0.1:9092"
