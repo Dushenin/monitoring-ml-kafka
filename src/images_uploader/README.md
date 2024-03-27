@@ -1,8 +1,4 @@
-Открой 2 терминала и запусти в первом:
+Открой терминал и запусти:
 ```
-python folder_checker.py
-```
-во втором:
-```
-streamlit run web.py
+streamlit run web_with_s3.py
 ```
