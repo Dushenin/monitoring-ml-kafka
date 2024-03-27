@@ -8,7 +8,7 @@ from json import dumps
 
 # Создание обработчика, который будет выводить логи на консоль
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)  # стутус INFO задаим (тут его как раз можно менять)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)  # Устанавливаем уровень логирования для обработчика на INFO
 # Создание форматировщика

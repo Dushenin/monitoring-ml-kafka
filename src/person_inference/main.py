@@ -136,7 +136,11 @@ def kafka_consumer():
         time.sleep(3) # ожидаем 3 секунды новое сообщение
 
 def bot_polling():
-    bot.infinity_polling()
+    try:
+        #bot.infinity_polling()
+        bot.polling(non_stop=True)
+    except Exception as e:
+        print(f"Ошибка в потоке Telegram бота: {e}")
 
 # 2 потока сделал чтобы обрабатывать паралльельно бесконечный цикл кафки и тг бота
 kafka_thread = threading.Thread(target=kafka_consumer)

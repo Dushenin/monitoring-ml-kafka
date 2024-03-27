@@ -1,4 +1,3 @@
-import logging
 import os
 from kafka import KafkaProducer
 from local_utils.S3Uploader import S3Uploader
@@ -54,7 +53,7 @@ def process_image(uploaded_file, image_path):
         results_sender.process(img, image_path)
         return True
     except Exception as e:
-        st.error(f"Ошибка при обработке фотографии: {e}")
+        st.error(f"Ошибка: {e}")
         return False
 
 if uploaded_files is not None:
