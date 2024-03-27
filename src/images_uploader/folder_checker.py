@@ -47,7 +47,7 @@ class ImageSender:
                     "timestamp_find_image": current_time
                 }
                 self.kafka_producer.send(self.topic, value=data)
-                print("Sent data:", data)
+                #print("Sent data:", data)
                 self.image_processor.mark_as_processed(full_path)
 
 

@@ -103,7 +103,7 @@ def kafka_consumer():
         time.sleep(3) # ожидаем 3 секунды новое сообщение
 
 def bot_polling():
-    bot.polling()
+    bot.infinity_polling()
 
 # 2 потока сделал чтобы обрабатывать паралльельно бесконечный цикл кафки и тг бота
 kafka_thread = threading.Thread(target=kafka_consumer)

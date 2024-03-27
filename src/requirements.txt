@@ -9,3 +9,4 @@ pyyaml
 psycopg2
 pyTelegramBotAPI
 streamlit==1.29.0
+minio
