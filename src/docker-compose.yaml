@@ -86,15 +86,48 @@ services:
       GF_DATABASE_USER: grafana_user
       GF_DATABASE_PASSWORD: grafana_password
       GF_DATABASE_SSL_MODE: disable
+      TZ: "Europe/Moscow"
     restart: unless-stopped
     depends_on:
       - pg_grafana
+      - prometheus
     ports:
       - "3111:3000"
     volumes:
       - ./ml_monitoring_services/grafana:/var/lib/grafana
 
+  s3:
+    container_name: s3
+    image: minio/minio
+    restart: always
+    ports:
+      - "9006:9000"
+      - "9005:9001"
+    volumes:
+      - ./ml_monitoring_services/s3_storage:/data
+    environment:
+      MINIO_ACCESS_KEY: s3_access_key
+      MINIO_SECRET_KEY: s3_secret_key
+    command: server /data --console-address ":9001"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./ml_monitoring_services/prometheus:/etc/prometheus/
+    container_name: prometheus
+    hostname: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Moscow"
+      
+
 volumes:
   pg_data_wh:
   pg_grafana:
   grafana:
+  s3:
+  prometheus:
