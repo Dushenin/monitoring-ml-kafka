@@ -39,12 +39,18 @@ results_sender = SendResults()
 st.title("Загрузка фотографий")
 uploaded_files = st.file_uploader("Загрузите фотографии", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
+# Инициализация состояния сессии
+if 'image_path_already_been' not in st.session_state:
+    st.session_state.image_path_already_been = set()
+
 
 def process_image(uploaded_file, image_path):
+    # Проверка на то, чтобы повторно ту же фотку в S3 не загружать
+    if image_path in st.session_state.image_path_already_been:
+        return True
     try:
         img = np.array(bytearray(uploaded_file.read()), dtype=np.uint8)
         img = cv2.imdecode(img, cv2.IMREAD_COLOR)  # bgr view
-        #gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         results_sender.process(img, image_path)
         return True
     except Exception as e:
@@ -60,5 +66,7 @@ if uploaded_files is not None:
         s3_image_path = f"{file_name}.jpeg"
         if process_image(uploaded_file, s3_image_path):
             st.success(f"Фотография {uploaded_file.name} успешно загружена")
+            # добавляем в сет уже обработанных фоток
+            st.session_state.image_path_already_been.add(s3_image_path)
         else:
             st.error(f"Ошибка при обработке фотографии {uploaded_file.name}")

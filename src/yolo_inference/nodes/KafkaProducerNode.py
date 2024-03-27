@@ -15,13 +15,13 @@ class KafkaProducerNode:
             value_serializer=lambda x: dumps(x).encode("utf-8"),
         )
 
-    def process(self, predict: bool, task_id, url) -> None:
+    def process(self, predict: bool, task_id, url, bucket_s3) -> None:
 
         data = {
             "task_id": task_id,
             "predict": predict,
             "url": url,
+            "bucket_s3": bucket_s3,
         }
-
         self.kafka_producer.send(self.topic_name, value=data).get(timeout=1)
         logging.info(f"KAFKA sent message: {data} topic {self.topic_name}")

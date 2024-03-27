@@ -5,6 +5,10 @@ from telebot import types
 import time
 import threading
 import yaml
+from minio import Minio
+import numpy as np
+import cv2
+import os
 
 from nodes.SentInfoPersonDBNode import SentInfoPersonDBNode
 
@@ -20,8 +24,16 @@ CHAT_ID = config["chat_id"]
 url = None
 predict = None
 task_id = None
-flag = False  # Flag to control the waiting mechanism of kafka
+flag = False  # Flag to control the waiting mechanism of kafka пока не дан ответ юзера
 sent_info_db_node = SentInfoPersonDBNode(config)
+
+# S3 configuration 
+minio_client = Minio(
+    config["s3"]["server_address"],
+    access_key=config["s3"]["s3_access_key"],
+    secret_key=config["s3"]["s3_secret_key"],
+    secure=False,
+)
 
 # Создаем экземпляр бота
 bot = telebot.TeleBot(TOKEN)
@@ -33,11 +45,25 @@ def send_message(msg_value):
     url = msg_value['url']
     predict = msg_value['predict']
     task_id = msg_value["task_id"]
+    bucket_name = msg_value['bucket_s3']
     # Определяем текст сообщения в зависимости от предсказания
     if predict:
         prediction_text = "Нейронная сеть считает что на фото ЕСТЬ человек"
     else:
         prediction_text = "Нейронная сеть считает что на фото НЕТ человека"
+
+
+    # Получаем объект изображения из s3
+    try:
+        response = minio_client.get_object(bucket_name, url)
+        image_data = response.read()
+        # Читаем изображение в формате OpenCV из полученных данных
+        img = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
+        # сохраняем фотку пришедшую из s3 под именем 'infer_img.jpg'
+        cv2.imwrite('infer_img.jpg', img)
+    except:
+        print(f"Downloading the image from S3 failed | {url}")
+
 
     markup = types.InlineKeyboardMarkup()
     button_ignore = types.InlineKeyboardButton(text="Игнорировать", callback_data="ignore")
@@ -49,9 +75,15 @@ def send_message(msg_value):
     # Отправляем сообщение с текстом предсказания и изображением, а также клавиатурой с кнопками
     bot.send_message(chat_id=CHAT_ID, text='------------------')
     bot.send_message(chat_id=CHAT_ID, text=prediction_text)
-    bot.send_photo(chat_id=CHAT_ID, photo=open(url, 'rb'), reply_markup=markup)
+    # отображаем 'infer_img.jpg'
+    bot.send_photo(chat_id=CHAT_ID, photo=open('infer_img.jpg', 'rb'), reply_markup=markup)
+
+    if os.path.exists('infer_img.jpg'):
+        # Удаляем файл
+        os.remove('infer_img.jpg')
 
 
+# Обработчик выбора ответа на вопрос что на фотке
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     global flag
@@ -78,6 +110,7 @@ def callback_query(call):
         bot.send_message(chat_id=CHAT_ID, text=f'Игнорируем эту фотографию')
     
 
+# обработчик команды /get_chat_info чтобы узнать id чата для указания в конфиге
 @bot.message_handler(commands=['get_chat_info'])
 def get_chat_info(message):
     chat_id = message.chat.id

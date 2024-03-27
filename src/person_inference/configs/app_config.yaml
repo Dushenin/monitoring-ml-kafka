@@ -18,3 +18,8 @@ sent_info_db_node:
 kafka_comsumer:
   topic : "imageCheckingResult"
   bootstrap_servers : "127.0.0.1:9092"
+
+s3:
+  server_address: "127.0.0.1:9006"
+  s3_access_key: "s3_access_key"
+  s3_secret_key: "s3_secret_key"

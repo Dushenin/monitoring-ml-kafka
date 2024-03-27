@@ -24,10 +24,10 @@ def main(config) -> None:
 
     for message in kafka_consumer:
         data = message.value
-        predict = detection_node.process(data['url'])
+        predict = detection_node.process(data)
 
         send_info_db_node.insert_data(predict, data['taskId'], data['url'], data['timestamp_find_image'])
-        send_kafka_node.process(predict, data['taskId'], data['url'])
+        send_kafka_node.process(predict, data['taskId'], data['url'], data["bucket_s3"])
   
 
 
