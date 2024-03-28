@@ -63,33 +63,13 @@ services:
     volumes:
       - ./ml_monitoring_services/pg_ml:/var/lib/postgresql/data
 
-  pg_grafana:
-    container_name: pg_grafana_1
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_DB: grafana_db
-      POSTGRES_USER: grafana_user
-      POSTGRES_PASSWORD: grafana_password
-    ports:
-      - "5499:5432"
-    volumes:
-      - ./ml_monitoring_services/pg_grafana:/var/lib/postgresql/data
-
   grafana:
     container_name: grafana_1
     image: grafana/grafana:latest
     environment:
-      GF_DATABASE_TYPE: postgres
-      GF_DATABASE_HOST: pg_grafana
-      GF_DATABASE_NAME: grafana_db
-      GF_DATABASE_USER: grafana_user
-      GF_DATABASE_PASSWORD: grafana_password
-      GF_DATABASE_SSL_MODE: disable
       TZ: "Europe/Moscow"
     restart: unless-stopped
     depends_on:
-      - pg_grafana
       - prometheus
     ports:
       - "3111:3000"
