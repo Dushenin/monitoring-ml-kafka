@@ -21,7 +21,7 @@ logger.addHandler(console_handler)
 class S3Uploader:
     def __init__(self, bucket_name) -> None:
         self.bucket_name = bucket_name
-        self.server_address = "127.0.0.1:9006"
+        self.server_address = "s3:9000" #"127.0.0.1:9006"
         self.s3_access_key = "s3_access_key"
         self.s3_secret_key = "s3_secret_key"
         self.client = Minio(

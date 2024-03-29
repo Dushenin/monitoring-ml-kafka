@@ -16,7 +16,7 @@ hydra:
 #--------------------------------------------------GENERAL--------------------------------------------------
 
 kafka_consumer:
-  bootstrap_servers: 127.0.0.1:9092  #kafka:29092
+  bootstrap_servers: kafka:29092 #127.0.0.1:9092 
   topic_name: imageForChecking
   
 # ------------------------------------------------- NODES --------------------------------------------------
@@ -33,11 +33,11 @@ send_info_db_node:
   connection_info:  # данные о подключении (должны совпадать со значениями из docker-compose файла)
     user: ml_user
     password: ml_password
-    host: localhost
-    port: 5488  # внешний порт контейнера с PostgreSQL
+    host: pg_ml #localhost
+    port: 5432 #5488  # внешний порт контейнера с PostgreSQL
     database: ml_db
 
 
 kafka_producer_node:
-  bootstrap_servers: 127.0.0.1:9092 #kafka:29092
+  bootstrap_servers: kafka:29092 #127.0.0.1:9092 
   topic_name: imageCheckingResult

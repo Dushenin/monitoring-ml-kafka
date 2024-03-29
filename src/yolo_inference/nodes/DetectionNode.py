@@ -25,7 +25,7 @@ class DetectionNode:
         self.classes_to_detect = config_yolo["classes_to_detect"]
 
         # S3 configuration 
-        server_address = "127.0.0.1:9006"
+        server_address = "s3:9000" #"127.0.0.1:9006"
         s3_access_key = "s3_access_key"
         s3_secret_key = "s3_secret_key"
         self.minio_client = Minio(

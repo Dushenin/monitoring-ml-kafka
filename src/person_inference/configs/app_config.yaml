@@ -11,15 +11,15 @@ sent_info_db_node:
   connection_info:  # данные о подключении (должны совпадать со значениями из docker-compose файла)
     user: ml_user
     password: ml_password
-    host: localhost
-    port: 5488  # внешний порт контейнера с PostgreSQL
+    host: pg_ml  #localhost
+    port: 5432  #5488  # внешний порт контейнера с PostgreSQL
     database: ml_db
 
 kafka_comsumer:
   topic : "imageCheckingResult"
-  bootstrap_servers : "127.0.0.1:9092"
+  bootstrap_servers : kafka:29092  #127.0.0.1:9092 
 
 s3:
-  server_address: "127.0.0.1:9006"
+  server_address: s3:9000   #127.0.0.1:9006
   s3_access_key: "s3_access_key"
   s3_secret_key: "s3_secret_key"

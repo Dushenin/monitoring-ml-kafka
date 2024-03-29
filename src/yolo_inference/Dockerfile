@@ -18,7 +18,7 @@ RUN set -xue ;\
     ;\
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y libgl1-mesa-glx && apt-get install -y libusb-1.0-0
+RUN apt-get update && apt-get install -y libgl1
 
 COPY . /app
 
@@ -26,7 +26,7 @@ COPY . /app
 WORKDIR /app
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Command to run your Python script
 CMD ["python3", "main.py"]

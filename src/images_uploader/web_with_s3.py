@@ -13,7 +13,7 @@ class SendResults:
     """Модуль отпраки сообщения в кафку и сохранения фотки в S3:"""
 
     def __init__(self) -> None:
-        self.kafka_bootstrap_servers: str = "127.0.0.1:9092"
+        self.kafka_bootstrap_servers: str = "kafka:29092" #"127.0.0.1:9092"
         self.kafka_topic: str = "imageForChecking"
         self.kafka_producer = KafkaProducer(
             bootstrap_servers=self.kafka_bootstrap_servers,
