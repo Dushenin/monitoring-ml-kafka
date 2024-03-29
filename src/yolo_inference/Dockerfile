@@ -29,4 +29,4 @@ WORKDIR /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Command to run your Python script
-CMD ["python3", "web.py"]
+CMD ["python3", "main.py"]

@@ -125,6 +125,40 @@ services:
     ports:
     - 6379:6379
 
+  images_uploader:
+    build: images_uploader
+    restart: always
+    container_name: images_uploader
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - 8501:8501
+
+  person_inference:
+    build: person_inference
+    restart: always
+    container_name: person_inference
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  yolo_inference:
+    build: yolo_inference
+    restart: always
+    container_name: yolo_inference
+    depends_on:
+      kafka:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+      
+
 volumes:
   pg_data_wh:
   pg_grafana:
