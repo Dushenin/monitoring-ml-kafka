@@ -103,7 +103,27 @@ services:
     restart: unless-stopped
     environment:
       TZ: "Europe/Moscow"
+    depends_on:
+      - cadvisor
       
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+    - 8080:8080
+    volumes:
+    - ./ml_monitoring_services/cadvisor:/rootfs:ro
+    - ./ml_monitoring_services/cadvisor/var/run:/var/run:rw
+    - ./ml_monitoring_services/cadvisor/sys:/sys:ro
+    - ./ml_monitoring_services/cadvisor/var/lib/docker/:/var/lib/docker:ro
+    depends_on:
+    - redis
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+    - 6379:6379
 
 volumes:
   pg_data_wh:
@@ -111,3 +131,4 @@ volumes:
   grafana:
   s3:
   prometheus:
+  cadvisor:

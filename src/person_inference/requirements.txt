@@ -1,13 +1,8 @@
-torch
 numpy
 opencv-python
 matplotlib
-ultralytics
-faker
 kafka-python
 pyyaml
 psycopg2
 pyTelegramBotAPI
-streamlit==1.29.0
 minio
-hydra-core
