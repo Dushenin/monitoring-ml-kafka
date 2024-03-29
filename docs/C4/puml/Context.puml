@@ -1,5 +1,5 @@
 @startuml "c4_context_image_service"
-!include libs/C4_Context.puml
+!include ../../libs/C4_Context.puml
 
 ' LAYOUT_WITH_LEGEND()
 

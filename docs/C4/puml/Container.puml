@@ -1,5 +1,5 @@
 @startuml "c4_container_image_service"
-!include libs/C4_Container.puml
+!include ../../libs/C4_Container.puml
 
 ' AddElementTag("microService", $shape=EightSidedShape(), $bgColor="CornflowerBlue", $fontColor="white", $legendText="micro service\neight sided")
 AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="white")
