@@ -107,23 +107,24 @@ services:
       - cadvisor
       
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.37.5
     container_name: cadvisor
+    restart: always
     ports:
-    - 8080:8080
+      - 8080:8080
     volumes:
-    - ./ml_monitoring_services/cadvisor:/rootfs:ro
-    - ./ml_monitoring_services/cadvisor/var/run:/var/run:rw
-    - ./ml_monitoring_services/cadvisor/sys:/sys:ro
-    - ./ml_monitoring_services/cadvisor/var/lib/docker/:/var/lib/docker:ro
+      - ./ml_monitoring_services/cadvisor:/rootfs:ro
+      - ./ml_monitoring_services/cadvisor/var/run:/var/run:rw
+      #- ./ml_monitoring_services/cadvisor/sys:/sys:ro
+      - ./ml_monitoring_services/cadvisor/var/lib/docker/:/var/lib/docker:ro
     depends_on:
-    - redis
+      - redis
 
   redis:
     image: redis:latest
     container_name: redis
     ports:
-    - 6379:6379
+      - 6379:6379
 
   images_uploader:
     build: images_uploader
