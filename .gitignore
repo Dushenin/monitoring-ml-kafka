@@ -5,4 +5,5 @@ src/all_images
 *.jpg
 *.JPG
 *.zip
+*.db
 src/ml_monitoring_services

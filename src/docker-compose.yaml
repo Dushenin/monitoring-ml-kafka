@@ -1,6 +1,10 @@
 version: '3.8'
-services:
 
+networks:
+  ml_monitoring:
+    driver: bridge
+
+services:
   zookeeper:
     image: wurstmeister/zookeeper
     container_name: zookeeper
@@ -12,6 +16,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - ml_monitoring
 
   kafka:
     image: wurstmeister/kafka
@@ -38,6 +44,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - ml_monitoring
 
   kafdrop:
     image: obsidiandynamics/kafdrop
@@ -49,6 +57,8 @@ services:
       KAFKA_BROKERCONNECT: "kafka:29092"
     depends_on:
       - kafka
+    networks:
+      - ml_monitoring
 
   pg_ml:
     container_name: pg_ml
@@ -62,6 +72,8 @@ services:
       - "5488:5432"
     volumes:
       - ./ml_monitoring_services/pg_ml:/var/lib/postgresql/data
+    networks:
+      - ml_monitoring
 
   grafana:
     container_name: grafana_1
@@ -75,6 +87,8 @@ services:
       - "3111:3000"
     volumes:
       - ./ml_monitoring_services/grafana:/var/lib/grafana
+    networks:
+      - ml_monitoring
 
   s3:
     container_name: s3
@@ -89,6 +103,8 @@ services:
       MINIO_ACCESS_KEY: s3_access_key
       MINIO_SECRET_KEY: s3_secret_key
     command: server /data --console-address ":9001"
+    networks:
+      - ml_monitoring
 
   prometheus:
     image: prom/prometheus:latest
@@ -105,6 +121,8 @@ services:
       TZ: "Europe/Moscow"
     depends_on:
       - cadvisor
+    networks:
+      - ml_monitoring
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -112,7 +130,8 @@ services:
     restart: unless-stopped
     expose:
       - 9100
-
+    networks:
+      - ml_monitoring
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.37.5
@@ -121,18 +140,22 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./ml_monitoring_services/cadvisor:/rootfs:ro
-      - ./ml_monitoring_services/cadvisor/var/run:/var/run:rw
-      #- ./ml_monitoring_services/cadvisor/sys:/sys:ro
-      - ./ml_monitoring_services/cadvisor/var/lib/docker/:/var/lib/docker:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
     depends_on:
       - redis
+    networks:
+      - ml_monitoring
 
   redis:
     image: redis:latest
     container_name: redis
     ports:
       - 6379:6379
+    networks:
+      - ml_monitoring
 
   images_uploader:
     build: images_uploader
@@ -143,6 +166,8 @@ services:
         condition: service_healthy
     ports:
       - 8501:8501
+    networks:
+      - ml_monitoring
 
   person_inference:
     build: person_inference
@@ -151,6 +176,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+    networks:
+      - ml_monitoring
 
   yolo_inference:
     build: yolo_inference
@@ -166,6 +193,8 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    networks:
+      - ml_monitoring
 
 volumes:
   pg_data_wh:
