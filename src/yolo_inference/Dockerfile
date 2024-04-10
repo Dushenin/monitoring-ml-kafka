@@ -1,4 +1,6 @@
-FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
+# в зависимости от версии cuda на компьютер расскоменитровать строку или внести необходимую версиюА
+# FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04 
+FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive LANG=C TZ=UTC
 ENV TERM linux
@@ -18,7 +20,7 @@ RUN set -xue ;\
     ;\
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y libgl1
+RUN apt-get update && apt-get install -y libgl1-mesa-glx
 
 COPY . /app
 
