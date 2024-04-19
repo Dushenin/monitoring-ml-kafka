@@ -1,6 +1,5 @@
 numpy
 opencv-python
-matplotlib
 faker
 kafka-python
 pyyaml

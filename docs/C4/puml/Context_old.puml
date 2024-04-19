@@ -18,11 +18,11 @@ System_Ext(service_2, "Приложение 2", "Хранит изображен
 Rel(admin, service_monitoring_system, "Использует для мониторинга сервиса")
 Rel(data_scientist, ml_monitoring_system, "Использует для мониторинга модели машинного обучения")
 
-Rel(service_monitoring_system, ml_service, "Собирает данные о работе сервиса")
-Rel(ml_monitoring_system, ml_service, "Собирает данные о работе модели")
+Rel(service_monitoring_system, ml_service, "Запрашивает данные о работе сервиса")
+Rel(ml_monitoring_system, ml_service, "Запрашивает данные о работе модели")
 
-Rel_Neighbor(service_1, ml_service, "Отправляет изображния для обработки", "Kafka")
-Rel_Neighbor(ml_service, service_1, "Отправляет результат проверки изображений", "Kafka")
-Rel_Neighbor(service_2, ml_service, "Отправляет изображния для обработки", "Kafka")
-Rel_Neighbor(ml_service, service_2, "Отправляет результат проверки изображений", "Kafka")
+Rel_Neighbor(service_1, ml_service, "Отправляет изображния для обработки")
+Rel_Neighbor(ml_service, service_1, "Отправляет результат проверки изображений")
+Rel_Neighbor(service_2, ml_service, "Отправляет изображния для обработки")
+Rel_Neighbor(ml_service, service_2, "Отправляет результат проверки изображений")
 @enduml
